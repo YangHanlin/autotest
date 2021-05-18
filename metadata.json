@@ -1,0 +1,14 @@
+{
+  "name": "autotest",
+  "version": "0.0",
+  "description": "A simple utility to run & judge programs",
+  "url": "https://github.com/YangHanlin/autotest",
+  "author": "Yang Hanlin",
+  "author_email": "mattoncis@hotmail.com",
+  "packages": ["autotest"],
+  "entry_points": {
+    "console_scripts": [
+      "autotest=autotest.cli:main"
+    ]
+  }
+}
