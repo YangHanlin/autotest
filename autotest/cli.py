@@ -1,5 +1,7 @@
 import argparse
 
+from . import run, generate
+
 
 def init_commandline_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
@@ -26,6 +28,15 @@ def init_commandline_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def dispatch_action(args: dict) -> None:
+    action = args.pop('action')
+    if action in ('run', 'r'):
+        run.main(args)
+    elif action in ('generate', 'gen', 'g'):
+        generate.main(args)
+    else:
+        raise NotImplementedError('Action {} is not implemented yet'.format(action))
+
+
 def main() -> None:
-    parsing_results = vars(init_commandline_parser().parse_args())
-    print('parsing results =', parsing_results)
+    dispatch_action(vars(init_commandline_parser().parse_args()))
