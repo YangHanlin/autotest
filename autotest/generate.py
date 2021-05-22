@@ -1,30 +1,25 @@
-import yaml
 import os
 
-EMPTY_CASE = {
-    'input': '1 1',
-    'output': '2',
-}
+from .common import *
 
 
 def fetch_cases(source: str) -> list[dict]:
-    return [EMPTY_CASE]  # Not implemented yet
+    return []  # not implemented yet
 
 
-def write_cases(cases: list[dict], path: str) -> None:
+def normalize_path(path: str) -> str:
     if '.' not in os.path.split(path)[-1]:
-        path = path + '.case.yml'
-
-    with open(path, 'w') as file:
-        file.write(yaml.dump({
-            'cases': cases,
-        }))
+        return path + '.case.yml'
+    else:
+        return path
 
 
 def main(args: dict) -> None:
-    if args['source'] is None:
-        cases = [EMPTY_CASE]
-    else:
-        cases = fetch_cases(args['source'])
-
-    write_cases(cases, args['case'])
+    path = normalize_path(args['case'])
+    source = args['source']
+    cases = read_cases(path)
+    if source is not None:
+        cases.extend(fetch_cases(source))
+    if not cases:
+        print('For information about case files, please refer to documentation')
+    write_cases(cases, path)
