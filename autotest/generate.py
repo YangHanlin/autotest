@@ -4,13 +4,27 @@ import argparse
 
 from .internal.case import *
 from .internal.commandline_action import CommandlineAction
+from .internal import fetching
+from .internal.fetching import UnsupportedSourceError
 
 logger = logging.getLogger(__name__)
 
 
 def fetch_cases(source: str) -> list[Case]:
-    logger.warning('fetching cases from \'{}\' is currently not supported'.format(source))
-    return []  # not implemented yet
+    fetch = None
+    for handler in fetching.handlers:
+        try:
+            logger.debug('trying with fetch handler {}'.format(handler.__name__))
+            fetch = handler(source)
+        except UnsupportedSourceError:
+            pass
+        else:
+            break
+    if fetch is None:
+        logger.warning('source {} is not currently supported'.format(source))
+        return []
+    logger.debug('using handler {}'.format(handler.__name__))
+    return fetch.get()
 
 
 def normalize_path(path: str) -> str:
@@ -36,7 +50,7 @@ def init_parser(parser: argparse.ArgumentParser):
                         help='case file to generate; suffix \'.case.yml\' will be appended if '
                              'no extension is provided')
     parser.add_argument('-s', '--source', required=False,
-                        help='source to fetch cases from, e.g. luogu/p1001')
+                        help='source to fetch cases from, e.g. https://www.luogu.com.cn/problem/UVA100')
 
 
 commandline_action = CommandlineAction(name='generate',
