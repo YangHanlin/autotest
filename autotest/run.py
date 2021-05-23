@@ -43,7 +43,7 @@ def main(command: str, case_path: Union[str, None], allow_nonzero: bool) -> None
                 actual_output = chalk.bgRed(actual_output)
             else:
                 actual_output = chalk.bgRed(actual_output) + ' EOF\n'
-            print(actual_output, expected_output, end='')
+            print(actual_output + expected_output, end='')
         print(proc.stderr, file=sys.stderr, end='')
 
     print('\nStatistics:')
