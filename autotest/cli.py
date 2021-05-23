@@ -8,6 +8,10 @@ actions = [
     run.commandline_action,
     generate.commandline_action,
 ]
+available_root_args = [
+    '-h',
+    '--help',
+]
 default_action = actions[0]
 
 
@@ -26,6 +30,8 @@ def init_commandline_parser() -> argparse.ArgumentParser:
 
 
 def preflight_check_action(arg: str) -> bool:
+    if arg in available_root_args:
+        return True
     for action in actions:
         if arg == action.name or arg in action.aliases:
             return True
