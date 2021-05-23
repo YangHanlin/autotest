@@ -18,7 +18,7 @@ class Fetch:
 
 
 class PintiaFetch(Fetch):
-    pattern = re.compile(r'^(?:https?://)?pintia.cn/problem-sets/(?P<problem_set_id>[^/\?#]*)/problems/(?P<problem_id>[^/\?#]*)')
+    pattern = re.compile(r'^(?:https?://)?pintia\.cn/problem-sets/(?P<problem_set_id>[^/\?#]*)/problems/(?P<problem_id>[^/\?#]*)')
 
     def __init__(self, source: str):
         super().__init__(source)
@@ -46,6 +46,33 @@ class PintiaFetch(Fetch):
         return cases
 
 
+class LuoguFetch(Fetch):
+    pattern = re.compile(r'^(?:https?://)(?:www\.)luogu\.com\.cn/problem/(?P<problem_id>[^/\?#]+)')
+
+    def __init__(self, source: str):
+        super().__init__(source)
+        match = re.search(LuoguFetch.pattern, source)
+        if match is None:
+            raise UnsupportedSourceError
+        self.problem_id = match.groupdict()['problem_id']
+
+    def get(self) -> list[Case]:
+        resp = requests.get('https://www.luogu.com.cn/problem/{problem_id}'.format(
+            problem_id=self.problem_id
+        ), headers={
+            'X-Luogu-Type': 'content-only',
+            'User-Agent': 'Autotest/0'
+        })
+        resp.raise_for_status()
+        data = resp.json()
+        timeout = data['currentData']['problem']['limits']['time'][0] / 1000
+        cases = []
+        for sample in data['currentData']['problem']['samples']:
+            cases.append(Case(sample[0], sample[1], timeout))
+        return cases
+
+
 handlers = [
     PintiaFetch,
+    LuoguFetch,
 ]
