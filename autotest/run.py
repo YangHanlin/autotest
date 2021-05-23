@@ -1,12 +1,15 @@
 import subprocess
+import sys
 import time
 import argparse
+from simple_chalk import chalk
 
 from .internal.case import *
 from .internal.commandline_action import CommandlineAction
+from .internal.judging import TrivialJudger
 
 
-def main(command: str, case_path: Union[str, None], allow_runtime_error: bool) -> None:
+def main(command: str, case_path: Union[str, None], allow_nonzero: bool) -> None:
     if case_path is None:
         case_path = command + '.case.yml'
 
@@ -15,30 +18,44 @@ def main(command: str, case_path: Union[str, None], allow_runtime_error: bool) -
     except FileNotFoundError as err:
         raise err  # TODO: replace with universal error handling mechanisms
 
+    judger = TrivialJudger({
+        'allow_nonzero': allow_nonzero,
+    })
     total = len(cases)
-    stats = {
-        'AC': 0,
-        'WA': 0,
-        'RE': 0,
-    }
-    for i, case in enumerate(cases):
-        print('Case #{}: '.format(i + 1), end='')
-        case_input, case_output = map(str, [case.input, case.output])
-        timestamp_start = time.time()
-        proc = subprocess.run(command, input=case_input, capture_output=True, shell=True, text=True)
-        timestamp_end = time.time()
-        if not allow_runtime_error and proc.returncode != 0:
-            stats['RE'] += 1
-            print('RE ', end='')
-        elif proc.stdout.strip() == case_output.strip():
-            stats['AC'] += 1
-            print('AC ', end='')
-        else:
-            stats['WA'] += 1
-            print('WA ', end='')
-        print(str(timestamp_end - timestamp_start) + 's')
 
-    print(stats)
+    for i, case in enumerate(cases):
+        print('Case {}/{}'.format(i + 1, total), end='')
+        start_time = time.time()
+        proc = subprocess.run(command, shell=True, text=True, input=case.input, capture_output=True)
+        end_time = time.time()
+        duration = end_time - start_time
+        print(' ({:.3f}s): '.format(duration), end='')
+        result = judger.judge(case, proc.stdout, duration, proc.returncode)
+        print(result.status)
+        if result.show_diff:
+            expected_output = case.output
+            if expected_output.endswith('\n'):
+                expected_output = chalk.bgGreen(expected_output)
+            else:
+                expected_output = chalk.bgGreen(expected_output) + ' EOF\n'
+            actual_output = proc.stdout
+            if actual_output.endswith('\n'):
+                actual_output = chalk.bgRed(actual_output)
+            else:
+                actual_output = chalk.bgRed(actual_output) + ' EOF\n'
+            print(actual_output, expected_output, end='')
+        print(proc.stderr, file=sys.stderr, end='')
+
+    print('\nStatistics:')
+    stats = judger.get_stats()
+    max_length = max(map(len, stats.keys()))
+    for stat in stats:
+        print('{key:{max_length}} = {value} ({percentage:.1f}%)'.format(
+            key=stat,
+            value=stats[stat],
+            max_length=max_length,
+            percentage=stats[stat] / total * 100.0
+        ))
 
 
 def init_parser(parser: argparse.ArgumentParser):
@@ -46,8 +63,9 @@ def init_parser(parser: argparse.ArgumentParser):
                         help='command to run')
     parser.add_argument('-c', '--case-path', required=False,
                         help='file to read cases from; defaults to <command>.case.yml')
-    parser.add_argument('-r', '--allow-runtime-error', required=False, action='store_true',
-                        help='allow runtime errors (in which command exits with non-zero code)')
+    parser.add_argument('-z', '--allow-nonzero', required=False, action='store_true',
+                        help='allow programs to exit with non-zero code; otherwise it will be considered '
+                             'as a runtime error (RE)')
 
 
 commandline_action = CommandlineAction(name='run',

@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_cases(source: str) -> list[Case]:
+    logger.warning('fetching cases from \'{}\' is currently not supported'.format(source))
     return []  # not implemented yet
 
 

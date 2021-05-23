@@ -11,6 +11,7 @@ class Case:
 
     @classmethod
     def from_dict(cls, data: dict):
+        data['input'], data['output'] = map(str, (data['input'], data['output']))
         return cls(**data)
 
     def to_dict(self):
@@ -24,8 +25,7 @@ class Case:
 def read_case_file(path: Union[str, Path], allow_nonexistent_file: bool = True) -> list[Case]:
     try:
         with open(path, 'r') as file:
-            # use of yaml.BaseLoader is intentional and considers all scalars as strings
-            case_structure = yaml.load(file.read(), yaml.BaseLoader)
+            case_structure = yaml.load(file.read(), yaml.SafeLoader)
             cases = list(map(Case.from_dict, case_structure['cases']))
             return cases
     except FileNotFoundError as err:
