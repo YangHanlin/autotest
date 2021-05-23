@@ -1,5 +1,6 @@
 import argparse
 import sys
+import logging
 
 from . import run, generate
 
@@ -16,7 +17,7 @@ default_action = actions[0]
 
 
 def init_application() -> None:
-    pass
+    logging.basicConfig(level=logging.INFO, style='{', format='{name}: {levelname}: {message}')
 
 
 def init_commandline_parser() -> argparse.ArgumentParser:

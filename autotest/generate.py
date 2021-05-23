@@ -5,7 +5,7 @@ import argparse
 from .internal.case import *
 from .internal.commandline_action import CommandlineAction
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def fetch_cases(source: str) -> list[Case]:
@@ -26,8 +26,7 @@ def main(case_path: str, source: Union[str, None]) -> None:
     if source is not None:
         cases.extend(fetch_cases(source))
     if not cases:
-        print(logger.getEffectiveLevel())
-        logger.info('For information about case files, please refer to documentation')
+        logger.info('seemingly an empty case file was generated; see documentation for case file format')
     write_case_file(cases, case_path)
 
 
