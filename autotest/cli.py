@@ -1,31 +1,35 @@
 import argparse
+import sys
 
 from . import run, generate
+
+
+actions = [
+    run.commandline_action,
+    generate.commandline_action,
+]
+default_action = actions[0]
+
+
+def init_application() -> None:
+    pass
 
 
 def init_commandline_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(metavar='action', help='action to take',
                                        dest='action', required=True)
-
-    run_parser = subparsers.add_parser('run', aliases=['r'],
-                                       help='run command and judge the results against cases')
-    run_parser.add_argument('command',
-                            help='command to run')
-    run_parser.add_argument('-c', '--case', required=False,
-                            help='file to read cases from; defaults to <command>.case.yml')
-    run_parser.add_argument('-r', '--allow-runtime-error', required=False, action='store_true',
-                            help='allow runtime errors (in which command exits with non-zero code)')
-
-    generate_parser = subparsers.add_parser('generate', aliases=['gen', 'g'],
-                                            help='generate empty test case file or fetch from OJ')
-    generate_parser.add_argument('case',
-                                 help='case file to generate; suffix \'.case.yml\' will be appended if '
-                                      'no extension is provided')
-    generate_parser.add_argument('-s', '--source', required=False,
-                                 help='source to fetch cases from, e.g. luogu/p1001')
-
+    for action in actions:
+        action_parser = subparsers.add_parser(name=action.name, aliases=action.aliases, help=action.help)
+        action.parser_handler(action_parser)
     return parser
+
+
+def preflight_check_action(arg: str) -> bool:
+    for action in actions:
+        if arg == action.name or arg in action.aliases:
+            return True
+    return False
 
 
 def dispatch_action(args: dict) -> None:
@@ -39,4 +43,8 @@ def dispatch_action(args: dict) -> None:
 
 
 def main() -> None:
-    dispatch_action(vars(init_commandline_parser().parse_args()))
+    init_application()
+    if len(sys.argv) < 2 or not preflight_check_action(sys.argv[1]):
+        sys.argv.insert(1, default_action.name)
+    args = vars(init_commandline_parser().parse_args())
+    dispatch_action(args)
