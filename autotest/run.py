@@ -6,10 +6,9 @@ from .internal.case import *
 from .internal.commandline_action import CommandlineAction
 
 
-def main(args: dict) -> None:
-    command = args['command']
-    case_path = args['case'] or command + '.case.yml'
-    allow_runtime_error = args['allow_runtime_error']
+def main(command: str, case_path: Union[str, None], allow_runtime_error: bool) -> None:
+    if case_path is None:
+        case_path = command + '.case.yml'
 
     try:
         cases = read_case_file(case_path, allow_nonexistent_file=False)
@@ -45,7 +44,7 @@ def main(args: dict) -> None:
 def init_parser(parser: argparse.ArgumentParser):
     parser.add_argument('command',
                         help='command to run')
-    parser.add_argument('-c', '--case', required=False,
+    parser.add_argument('-c', '--case-path', required=False,
                         help='file to read cases from; defaults to <command>.case.yml')
     parser.add_argument('-r', '--allow-runtime-error', required=False, action='store_true',
                         help='allow runtime errors (in which command exits with non-zero code)')

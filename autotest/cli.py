@@ -33,13 +33,15 @@ def preflight_check_action(arg: str) -> bool:
 
 
 def dispatch_action(args: dict) -> None:
-    action = args.pop('action')
-    if action in ('run', 'r'):
-        run.main(args)
-    elif action in ('generate', 'gen', 'g'):
-        generate.main(args)
-    else:
-        raise NotImplementedError('Action {} is not implemented yet'.format(action))
+    action_name = args.pop('action')
+    main_handler = None
+    for action in actions:
+        if action_name == action.name or action_name in action.aliases:
+            main_handler = action.main_handler
+            break
+    if main_handler is None:
+        raise NotImplementedError
+    return main_handler(**args)
 
 
 def main() -> None:
