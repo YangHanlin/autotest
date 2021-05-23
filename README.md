@@ -49,7 +49,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -s SOURCE, --source SOURCE
-                        source to fetch cases from, e.g. luogu/p1001
+                        source to fetch cases from, e.g.
+                        https://www.luogu.com.cn/problem/UVA100
 ```
 
 <!-- usage-replacement-end -->
