@@ -12,7 +12,7 @@ pip install git+https://github.com/YangHanlin/autotest.git@main
 
 <!-- usage-replacement-start -->
 
-```bash
+```
 $ autotest --help
 usage: autotest [-h] action ...
 
@@ -26,22 +26,25 @@ optional arguments:
   -h, --help         show this help message and exit
 
 $ autotest run --help
-usage: autotest run [-h] [-c CASE] [-r] command
+usage: autotest run [-h] [-c CASE_PATH] [-z] command
 
 positional arguments:
   command               command to run
 
 optional arguments:
   -h, --help            show this help message and exit
-  -c CASE, --case CASE  file to read cases from; defaults to <command>.case.yml
-  -r, --allow-runtime-error
-                        allow runtime errors (in which command exits with non-zero code)
+  -c CASE_PATH, --case-path CASE_PATH
+                        file to read cases from; defaults to
+                        <command>.case.yml
+  -z, --allow-nonzero   allow programs to exit with non-zero code; otherwise
+                        it will be considered as a runtime error (RE)
 
 $ autotest generate --help
-usage: autotest generate [-h] [-s SOURCE] case
+usage: autotest generate [-h] [-s SOURCE] case_path
 
 positional arguments:
-  case                  case file to generate; suffix '.case.yml' will be appended if no extension is provided
+  case_path             case file to generate; suffix '.case.yml' will be
+                        appended if no extension is provided
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,3 +53,16 @@ optional arguments:
 ```
 
 <!-- usage-replacement-end -->
+
+## Case file format
+
+Below is a case file for A+B problem to illustrate its format.
+
+```yaml
+cases:  # array
+  - input: 1 2  # test input 
+    output: 3  # expected output
+  - input: 5 6
+    output: 11
+    timeout: 0.1  # time limit (in seconds, optional)
+```
