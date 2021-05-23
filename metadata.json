@@ -5,7 +5,10 @@
   "url": "https://github.com/YangHanlin/autotest",
   "author": "Yang Hanlin",
   "author_email": "mattoncis@hotmail.com",
-  "packages": ["autotest"],
+  "packages": [
+    "autotest",
+    "autotest.internal"
+  ],
   "entry_points": {
     "console_scripts": [
       "autotest=autotest.cli:main"

@@ -39,6 +39,7 @@ class TrivialJudger:
             status_fragments.append('TLE (+{:.4f}s)'.format(time - case.timeout))
 
         if not status_fragments:
+            self.stats['AC'] += 1
             status_fragments.append('AC')
 
         return JudgeResult(', '.join(status_fragments), show_diff)
