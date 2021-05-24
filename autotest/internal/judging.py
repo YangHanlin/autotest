@@ -28,6 +28,7 @@ class TrivialJudger:
 
         if case.output != output and case.output + '\n' != output and case.output != output + '\n':
             self.stats['WA'] += 1
+            status_fragments.append('WA')
             show_diff = True
 
         if not self.allow_nonzero and exit_code != 0:
