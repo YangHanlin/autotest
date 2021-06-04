@@ -1,6 +1,6 @@
 {
   "name": "autotest",
-  "version": "0.2",
+  "version": "0.2.1",
   "description": "A simple utility to run & judge programs",
   "url": "https://github.com/YangHanlin/autotest",
   "author": "Yang Hanlin",
