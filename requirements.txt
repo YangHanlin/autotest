@@ -1,3 +1,4 @@
 requests
 PyYAML
 simple_chalk
+beautifulsoup4
