@@ -21,6 +21,12 @@ class Case:
             'timeout': self.timeout,
         }
 
+    def __str__(self):
+        return '<{} input={}, output={}, timeout={}>'.format(self.__class__.__name__, repr(self.input), repr(self.output), repr(self.timeout))
+
+    def __repr__(self):
+        return '{}(input={}, output={}, timeout={})'.format(self.__class__.__name__, repr(self.input), repr(self.output), repr(self.timeout))
+
 
 def read_case_file(path: Union[str, Path], allow_nonexistent_file: bool = True) -> list[Case]:
     try:
